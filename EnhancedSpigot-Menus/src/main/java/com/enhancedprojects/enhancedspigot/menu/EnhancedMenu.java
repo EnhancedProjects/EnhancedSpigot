@@ -198,39 +198,29 @@ import java.util.function.Consumer;
 	}
 
 	@EventHandler
-	public void onGlobalClick(InventoryClickEvent event) {
+	public void onClick(InventoryClickEvent event) {
 		Inventory inv = event.getInventory();
-		Inventory clickedInv = event.getClickedInventory();
 		if (!this.isMenu(inv)) return;
+		Inventory clickedInv = event.getClickedInventory();
 
 		if (this.getGlobalClickAction() != null) {
 			MenuItem.ClickLocation clickLocation = clickedInv == null ?
 				MenuItem.ClickLocation.OUTSIDE :
 				clickedInv.equals(this.bukkitInventory) ?
-					MenuItem.ClickLocation.TOP :
-					MenuItem.ClickLocation.BOTTOM;
+				MenuItem.ClickLocation.TOP :
+				MenuItem.ClickLocation.BOTTOM;
 			this.getGlobalClickAction()
 				.accept(event, clickLocation);
 		}
-	}
 
-	@EventHandler
-	public void onClick(InventoryClickEvent event) {
-		Inventory inv = event.getClickedInventory();
-		if (!this.isMenu(inv)) return;
+		if (!this.isMenu(clickedInv)) return;
 
 		int slot = event.getSlot();
 		MenuContainer container = this.getContainerAt(slot);
-
-		if (container == null) {
-			return;
-		}
+		if (container == null) return;
 
 		MenuItem item = container.getItem(container.getContainerLocFromMenuLoc(slot));
-
-		if (item == null) {
-			return;
-		}
+		if (item == null) return;
 
 		if (item.getClickAction() != null) {
 			item.getClickAction()
