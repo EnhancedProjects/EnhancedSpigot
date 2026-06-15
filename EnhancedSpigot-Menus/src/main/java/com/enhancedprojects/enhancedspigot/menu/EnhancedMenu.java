@@ -18,24 +18,17 @@ package com.enhancedprojects.enhancedspigot.menu;
 
 import com.enhancedprojects.enhancedspigot.menu.container.MenuContainer;
 import com.enhancedprojects.enhancedspigot.menu.item.MenuItem;
+import com.enhancedprojects.enhancedspigot.menu.listener.MenuListener;
 import com.enhancedprojects.enhancedspigot.menu.nms.InventoryHelperUtil;
 import com.enhancedprojects.enhancedspigot.util.DependencyProvider;
-import com.enhancedprojects.enhancedspigot.util.Pair;
-import com.enhancedprojects.enhancedspigot.util.SchedulerUtil;
 import com.enhancedprojects.enhancedspigot.util.TryCatchUtil;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -47,7 +40,7 @@ import java.util.function.Consumer;
 /**
  * EnhancedMenu handles menu making process in plugin
  */
-@Getter @Setter public abstract class EnhancedMenu implements Listener {
+@Getter @Setter public abstract class EnhancedMenu {
 	protected final DependencyProvider provider;
 	protected final JavaPlugin plugin;
 
@@ -89,9 +82,6 @@ import java.util.function.Consumer;
 		if (this.rows > 6 || this.rows < 1) {
 			throw new IllegalArgumentException("rows must be between 1 and 6");
 		}
-
-		Bukkit.getPluginManager()
-			.registerEvents(this, this.plugin);
 
 		return new EnhancedMenuHolder(this, (this.rows * 9), title).getInventory();
 	}
@@ -148,6 +138,8 @@ import java.util.function.Consumer;
 	public void open(Player player) {
 		prepareGui();
 		player.openInventory(bukkitInventory);
+		MenuListener.getInstance(this.plugin)
+			.addViewer(player, this);
 	}
 
 	/**
@@ -195,104 +187,6 @@ import java.util.function.Consumer;
 				TryCatchUtil.tryRun(() -> InventoryHelperUtil.getInventoryHelper()
 					.updateInventoryTitle((Player) viewer, title));
 			});
-	}
-
-	@EventHandler
-	public void onClick(InventoryClickEvent event) {
-		Inventory inv = event.getInventory();
-		if (!this.isMenu(inv)) return;
-		Inventory clickedInv = event.getClickedInventory();
-
-		if (this.getGlobalClickAction() != null) {
-			MenuItem.ClickLocation clickLocation = clickedInv == null ?
-				MenuItem.ClickLocation.OUTSIDE :
-				clickedInv.equals(this.bukkitInventory) ?
-				MenuItem.ClickLocation.TOP :
-				MenuItem.ClickLocation.BOTTOM;
-			this.getGlobalClickAction()
-				.accept(event, clickLocation);
-		}
-
-		if (!this.isMenu(clickedInv)) return;
-
-		int slot = event.getSlot();
-		MenuContainer container = this.getContainerAt(slot);
-		if (container == null) return;
-
-		MenuItem item = container.getItem(container.getContainerLocFromMenuLoc(slot));
-		if (item == null) return;
-
-		if (item.getClickAction() != null) {
-			item.getClickAction()
-				.accept(event, MenuItem.ClickLocation.TOP);
-		}
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onUpdate(InventoryClickEvent event) {
-		if (!this.updateItems) {
-			return;
-		}
-
-		Inventory inv = event.getInventory();
-		if (!this.isMenu(inv)) return;
-
-		SchedulerUtil.runTaskLater(
-			this.plugin, () -> {
-				for (int i = 0; i < inv.getContents().length; i++) {
-					ItemStack realIS = inv.getItem(i);
-					MenuContainer container = getContainerAt(i);
-					if (container == null) {
-						continue;
-					}
-					Pair<Integer, Integer> loc = container.getContainerLocFromMenuLoc(i);
-					MenuItem menuItem = container.getItem(loc);
-
-					if (menuItem == null) {
-						if (realIS != null && !realIS.getType()
-							.equals(Material.AIR)) {
-							container.setItem(loc.getFirst(), loc.getSecond(), new MenuItem(realIS));
-						}
-						continue;
-					}
-
-					if (realIS == null || realIS.getType()
-						.equals(Material.AIR)) {
-						container.removeItem(loc.getFirst(), loc.getSecond());
-						continue;
-					}
-
-					if (menuItem.getItemStack()
-						.isSimilar(realIS)) {
-						continue;
-					}
-
-					menuItem.setItemStack(realIS);
-				}
-			}, 3
-		);
-	}
-
-	@EventHandler
-	public void onDrag(InventoryDragEvent event) {
-		Inventory inv = event.getInventory();
-		if (!this.isMenu(inv)) return;
-
-		if (this.getGlobalDragAction() != null) {
-			this.getGlobalDragAction()
-				.accept(event);
-		}
-	}
-
-	@EventHandler
-	public void onClose(InventoryCloseEvent event) {
-		Inventory inv = event.getInventory();
-		if (!this.isMenu(inv)) return;
-
-		if (this.getCloseAction() != null) {
-			this.getCloseAction()
-				.accept(event);
-		}
 	}
 
 	@Override
