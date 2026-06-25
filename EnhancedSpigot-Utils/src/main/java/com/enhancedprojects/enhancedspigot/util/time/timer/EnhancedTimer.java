@@ -240,6 +240,8 @@ import java.util.stream.Collectors;
 	}
 
 	private void sendMessageToViewers(String message) {
+		if (message.isEmpty()) return;
+
 		TimerType output;
 		if (this.type == TimerType.BOSSBAR && this.bossBar == null && this.bossBarFinishOutput != null) {
 			output = this.bossBarFinishOutput;
