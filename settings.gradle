@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 KPG-TB
+ * Copyright 2026 KPG-TB
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,3 +25,4 @@ include 'EnhancedSpigot-Menus'
 include 'EnhancedSpigot-Items'
 include 'EnhancedSpigot-Gradle'
 include 'EnhancedSpigot-Commons'
+include 'EnhancedSpigot-Network'

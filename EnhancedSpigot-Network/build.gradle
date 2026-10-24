@@ -1,0 +1,36 @@
+/*
+ * Copyright 2026 KPG-TB
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+description = "EnhancedSpigot Network module adds services to communicate between proxied servers"
+
+repositories {
+    mavenCentral()
+    maven { url "https://hub.spigotmc.org/nexus/content/repositories/snapshots/" }
+}
+
+dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT'
+
+    implementation project(':EnhancedSpigot-Commons')
+    implementation project(':EnhancedSpigot-Utils')
+    implementation project(':EnhancedSpigot-Configs')
+}
+
+shadowJar {
+    dependsOn ':EnhancedSpigot-Commons:shadowJar'
+    dependsOn ':EnhancedSpigot-Utils:shadowJar'
+    dependsOn ':EnhancedSpigot-Configs:shadowJar'
+}

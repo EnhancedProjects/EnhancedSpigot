@@ -17,5 +17,5 @@
 package com.enhancedprojects
 
 enum EnhancedModule {
-    Commons, Utils, Configs, Locale, Data, Commands, Menus, Items, Plugin
+    Commons, Utils, Configs, Locale, Data, Commands, Menus, Items, Plugin, Network
 }

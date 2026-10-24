@@ -25,6 +25,8 @@ import com.enhancedprojects.enhancedspigot.data.migration.MigrationController;
 import com.enhancedprojects.enhancedspigot.item.ItemController;
 import com.enhancedprojects.enhancedspigot.item.recipe.RecipeController;
 import com.enhancedprojects.enhancedspigot.locale.EnhancedLocale;
+import com.enhancedprojects.enhancedspigot.network.NetworkService;
+import com.enhancedprojects.enhancedspigot.network.config.NetworkSettings;
 import com.enhancedprojects.enhancedspigot.util.DependencyProvider;
 import com.enhancedprojects.enhancedspigot.util.SchedulerUtil;
 import com.enhancedprojects.enhancedspigot.util.SemanticVersion;
@@ -160,6 +162,13 @@ public abstract class EnhancedPlugin extends JavaPlugin {
 		this.dependencyProvider.register(controller);
 
 		return controller;
+	}
+
+	protected NetworkService enableNetwork(NetworkSettings settings) {
+		NetworkService service = new NetworkService(this.dependencyProvider, settings);
+		service.start();
+		this.dependencyProvider.register(service);
+		return service;
 	}
 
 	protected <T extends EnhancedLocale> T useLocale(T locale) {

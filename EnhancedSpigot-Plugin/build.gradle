@@ -39,6 +39,7 @@ dependencies {
     compileOnly project(':EnhancedSpigot-Data')
     compileOnly project(':EnhancedSpigot-Locale')
     compileOnly project(':EnhancedSpigot-Items')
+    compileOnly project(':EnhancedSpigot-Network')
 }
 
 shadowJar {
@@ -51,4 +52,5 @@ shadowJar {
     dependsOn ':EnhancedSpigot-Data:shadowJar'
     dependsOn ':EnhancedSpigot-Locale:shadowJar'
     dependsOn ':EnhancedSpigot-Items:shadowJar'
+    dependsOn ':EnhancedSpigot-Network:shadowJar'
 }

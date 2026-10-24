@@ -66,6 +66,12 @@ class Plugin implements org.gradle.api.Plugin<Project> {
                 if (ext.importPapi.get()) compileOnly 'me.clip:placeholderapi:2.11.7'
             }
 
+            project.configurations.configureEach {
+                resolutionStrategy.capabilitiesResolution.withCapability("org.bukkit:bukkit") {
+                    selectHighestVersion()
+                }
+            }
+
             project.tasks.withType(JavaCompile).configureEach {
                 if (ext.enabledModules.get().contains(EnhancedModule.Commands)) options.compilerArgs << "-parameters"
             }
