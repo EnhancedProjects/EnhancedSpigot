@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.annotation.Nullable;
 
 @Getter @Setter public abstract class AbstractQuestionPacket<T extends AbstractAnswerPacket> extends AbstractPacket {
+	private boolean askYourself;
 	private boolean answerAll;
 	private long ttl;
 	private long expiresAt;
@@ -15,6 +16,7 @@ import javax.annotation.Nullable;
 	private transient T defaultAnswer;
 
 	public AbstractQuestionPacket() {
+		this.askYourself = false;
 		this.answerAll = true;
 		this.ttl = 60_000L;
 		this.expiresAt = 0L;

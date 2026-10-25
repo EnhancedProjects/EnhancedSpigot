@@ -65,15 +65,17 @@ public class NetworkService extends Service {
 			((IServerPacket) packet).handleServer(this.plugin);
 		}
 
-		if (!internal && packet instanceof AbstractQuestionPacket<?>) {
+		if (packet instanceof AbstractQuestionPacket<?>) {
 			AbstractQuestionPacket<?> question = (AbstractQuestionPacket<?>) packet;
 
-			AbstractAnswerPacket answer = question.answer(this.plugin);
-			if (answer != null) {
-				answer.setAnswerId(packet.getId());
-				if (!question.isAnswerAll()) answer.setTargets(Arrays.asList(packet.getSource()));
+			if (question.isAskYourself() || !internal) {
+				AbstractAnswerPacket answer = question.answer(this.plugin);
+				if (answer != null) {
+					answer.setAnswerId(packet.getId());
+					if (!question.isAnswerAll()) answer.setTargets(Arrays.asList(packet.getSource()));
 
-				this.sendPacket(answer);
+					this.sendPacket(answer);
+				}
 			}
 		}
 
