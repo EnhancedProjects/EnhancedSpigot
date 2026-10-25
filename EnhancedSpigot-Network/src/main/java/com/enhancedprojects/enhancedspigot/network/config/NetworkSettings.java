@@ -1,6 +1,5 @@
 package com.enhancedprojects.enhancedspigot.network.config;
 
-import com.enhancedprojects.enhancedspigot.config.EnhancedConfig;
 import com.enhancedprojects.enhancedspigot.config.annotation.Comment;
 import com.enhancedprojects.enhancedspigot.config.annotation.Serializer;
 import com.enhancedprojects.enhancedspigot.config.serializer.impl.BaseSerializer;
@@ -9,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-@Serializer(BaseSerializer.class) @Getter @NoArgsConstructor public class NetworkSettings extends EnhancedConfig {
+@Serializer(BaseSerializer.class) @Getter @NoArgsConstructor public class NetworkSettings {
 	@Comment("The network id this plugin is running on. Only servers within the same network can communicate with each other.") private String networkId = "net";
 	@Comment("A unique id for this server. This is used to identify the server when sending packets.") private String serverId = "server" + UUID.randomUUID()
 		.toString()
