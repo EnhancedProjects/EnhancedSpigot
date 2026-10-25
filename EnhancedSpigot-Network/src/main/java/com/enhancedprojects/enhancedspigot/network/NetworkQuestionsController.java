@@ -7,6 +7,7 @@ import com.enhancedprojects.enhancedspigot.network.packet.AbstractQuestionPacket
 import com.enhancedprojects.enhancedspigot.util.SchedulerUtil;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -36,7 +37,14 @@ public class NetworkQuestionsController extends Controller {
 		if (!this.awaitingQuestions.containsKey(packet.getAnswerId())) return;
 
 		AbstractQuestionPacket<T> question = (AbstractQuestionPacket<T>) this.awaitingQuestions.get(packet.getAnswerId());
-		if (question.getExpiresAt() <= System.currentTimeMillis() || question.getAnswers() >= question.getMaxAnswers()) return;
+		if (question.getExpiresAt() <= System.currentTimeMillis() || question.getAnswers() >= question.getMaxAnswers()) {
+			if (question.getDefaultAnswer() == null) return;
+			if (!Objects.equals(
+				question.getDefaultAnswer()
+					.getId(), packet.getId()
+			)) return;
+			this.awaitingQuestions.remove(question.getId());
+		}
 
 		question.setAnswers(question.getAnswers() + 1);
 		question.handleAnswer(this.plugin, packet);
@@ -58,9 +66,10 @@ public class NetworkQuestionsController extends Controller {
 			this.plugin, () -> {
 				this.awaitingQuestions.forEach((id, packet) -> {
 					if (packet.getExpiresAt() <= System.currentTimeMillis() || packet.getAnswers() >= packet.getMaxAnswers()) {
-						this.awaitingQuestions.remove(id);
 						if (packet.getDefaultAnswer() != null && packet.getAnswers() == 0) {
-							this.networkService.receivePacket(packet.getDefaultAnswer(), true);
+							this.networkService.sendPacket(packet.getDefaultAnswer());
+						} else {
+							this.awaitingQuestions.remove(id);
 						}
 					}
 				});

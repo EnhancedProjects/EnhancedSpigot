@@ -43,13 +43,18 @@ public class NetworkService extends Service {
 			AbstractQuestionPacket<?> question = (AbstractQuestionPacket<?>) packet;
 
 			question.setExpiresAt(System.currentTimeMillis() + question.getTtl());
-			if (question.getDefaultAnswer() != null) question.getDefaultAnswer()
-				.setAnswerId(packet.getId());
+
+			AbstractAnswerPacket defaultAnswer = question.getDefaultAnswer();
+			if (defaultAnswer != null) {
+				defaultAnswer.setAnswerId(packet.getId());
+				if (!question.isAnswerAll()) defaultAnswer.setTargets(Arrays.asList(packet.getSource()));
+			}
+
 			this.questionsController.watchQuestion(question);
 		}
 
-		this.receivePacket(packet, true);
 		this.packetHandler.sendPacket(packet);
+		this.receivePacket(packet, true);
 	}
 
 	public void sendRawBungeePacket(AbstractRawBungeePacket rawBungeePacket) {
@@ -105,6 +110,8 @@ public class NetworkService extends Service {
 
 	@Override
 	public void start() {
+		this.questionsController.start();
+
 		this.bungeeHandler = new BungeeHandler(this.plugin, this);
 		this.bungeeHandler.init();
 
